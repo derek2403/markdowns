@@ -1,79 +1,87 @@
-Gasless Transactions on Sui with Shinami Gas Station
+# Gasless Transactions on Sui with Shinami Gas Station
 
 A complete 1-hour workshop kit: slides, script, code walk-through, and lab guide — in one markdown file.
 
-⸻
+---
 
-Table of Contents
-	1.	Workshop Goals
-	2.	Audience & Prerequisites
-	3.	Problem & Solution Overview
-	4.	Architecture at a Glance
-	5.	Project Structure
-	6.	Setup & Installation
-	7.	Configuration
-	8.	Core Concepts
-	9.	Codebase Walk-through (File by File)
-	10.	Backend API Routes
-	11.	Frontend Components
-	12.	Smart Contract Module (Move)
-	13.	End-to-End Flows
-	14.	Live Demo Script
-	15.	Common Pitfalls & Fixes
-	16.	Production Considerations
-	17.	Testing & Verification
-	18.	Workshop Timeline
-	19.	Presenter Notes
-	20.	Quick Reference
-	21.	Next Steps & Resources
+## Table of Contents
 
-⸻
+1. [Workshop Goals](#workshop-goals)
+2. [Audience & Prerequisites](#audience--prerequisites)
+3. [Problem & Solution Overview](#problem--solution-overview)
+4. [Architecture at a Glance](#architecture-at-a-glance)
+5. [Project Structure](#project-structure)
+6. [Setup & Installation](#setup--installation)
+7. [Configuration](#configuration)
+8. [Core Concepts](#core-concepts)
+9. [Codebase Walk-through (File by File)](#codebase-walk-through-file-by-file)
+10. [Backend API Routes](#backend-api-routes)
+11. [Frontend Components](#frontend-components)
+12. [Smart Contract Module (Move)](#smart-contract-module-move)
+13. [End-to-End Flows](#end-to-end-flows)
+14. [Live Demo Script](#live-demo-script)
+15. [Common Pitfalls & Fixes](#common-pitfalls--fixes)
+16. [Production Considerations](#production-considerations)
+17. [Testing & Verification](#testing--verification)
+18. [Workshop Timeline](#workshop-timeline)
+19. [Presenter Notes](#presenter-notes)
+20. [Quick Reference](#quick-reference)
+21. [Next Steps & Resources](#next-steps--resources)
 
-Workshop Goals
-	•	Understand why gas sponsorship removes major onboarding friction.
-	•	Learn how Shinami Gas Station works on Sui using two signatures.
-	•	Integrate a working gasless experience in a Next.js App Router project.
-	•	Deploy and test a simple Move module and call it with sponsored gas.
-	•	Leave with a repeatable pattern you can drop into real dApps.
+---
 
-⸻
+## Workshop Goals
 
-Audience & Prerequisites
+- Understand why gas sponsorship removes major onboarding friction
+- Learn how Shinami Gas Station works on Sui using two signatures
+- Integrate a working gasless experience in a Next.js App Router project
+- Deploy and test a simple Move module and call it with sponsored gas
+- Leave with a repeatable pattern you can drop into real dApps
 
-Who this is for
+---
+
+## Audience & Prerequisites
+
+### Who this is for
+
 Frontend and full-stack developers exploring Sui; teams that want gasless UX.
 
-You need
-	•	Node.js 18+, npm, Git, a code editor
-	•	A Sui wallet extension (Sui Wallet, Ethos, Suiet) on Testnet
-	•	A Shinami account with Gas Station and Node keys (Testnet is fine)
+### You need
 
-⸻
+- Node.js 18+, npm, Git, a code editor
+- A Sui wallet extension (Sui Wallet, Ethos, Suiet) on Testnet
+- A Shinami account with Gas Station and Node keys (Testnet is fine)
 
-Problem & Solution Overview
+---
 
-The Problem
+## Problem & Solution Overview
+
+### The Problem
 
 Users must obtain SUI before they can even try your app:
-	•	Install wallet → get tokens → configure network → then try the dApp
-	•	This causes high drop-off during onboarding
 
-The Solution
+- Install wallet → get tokens → configure network → then try the dApp
+- This causes high drop-off during onboarding
+
+### The Solution
 
 A Gas Station sponsors gas fees on behalf of users:
-	•	Users still sign the transaction content
-	•	The sponsor pays the gas fee
-	•	Users can try your app immediately
 
-The Core Idea: Two Signatures
-	•	User signature → “I approve this transaction’s content”
-	•	Sponsor signature → “I will pay the gas for this transaction”
-	•	The blockchain validates both, then executes
+- Users still sign the transaction content
+- The sponsor pays the gas fee
+- Users can try your app immediately
 
-⸻
+### The Core Idea: Two Signatures
 
-Architecture at a Glance
+- **User signature** → "I approve this transaction's content"
+- **Sponsor signature** → "I will pay the gas for this transaction"
+- The blockchain validates both, then executes
 
+---
+
+## Architecture at a Glance
+
+```
 Frontend (Browser)
 • Connect wallet
 • Collect params
@@ -97,12 +105,13 @@ Shinami Services
 Sui Blockchain
 • Validates user + sponsor signatures
 • Executes transaction
+```
 
+---
 
-⸻
+## Project Structure
 
-Project Structure
-
+```
 sui-gas-station-app/
 ├── app/
 │   ├── api/
@@ -122,12 +131,13 @@ sui-gas-station-app/
 ├── .env.local                              # API keys and config
 ├── next.config.ts                          # Next.js config
 └── package.json
+```
 
+---
 
-⸻
+## Setup & Installation
 
-Setup & Installation
-
+```bash
 # 1) Create a Next.js App Router project (or use your existing app)
 npx create-next-app@latest sui-gas-station-app
 cd sui-gas-station-app
@@ -137,14 +147,15 @@ npm install @mysten/sui @mysten/dapp-kit @shinami/clients @tanstack/react-query
 
 # 3) Start dev server
 npm run dev
+```
 
+---
 
-⸻
+## Configuration
 
-Configuration
+### Environment Variables (.env.local)
 
-Environment Variables (.env.local)
-
+```bash
 # Shinami keys (get from your Shinami dashboard)
 SHINAMI_GAS_STATION_ACCESS_KEY=us1_sui_testnet_xxxxx
 SHINAMI_NODE_ACCESS_KEY=us1_sui_testnet_xxxxx
@@ -154,11 +165,13 @@ NEXT_PUBLIC_SUI_NETWORK=testnet
 
 # Your Move package id (after publishing)
 NEXT_PUBLIC_MOVE_PACKAGE_ID=0xYOUR_PACKAGE_ID
+```
 
-Next.js Config (next.config.ts)
+### Next.js Config (next.config.ts)
 
 Externalize Shinami SDK on the server to avoid bundling errors.
 
+```typescript
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -172,23 +185,25 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+```
 
+---
 
-⸻
+## Core Concepts
 
-Core Concepts
-	•	GaslessTransaction: built with buildGaslessTransaction(); sponsor-ready.
-	•	Never use txb.gas in gasless flows; the gas object does not exist yet.
-	•	Sender provides assets, sponsor pays gas only.
-	•	Execute with two signatures in this order: [userSignature, sponsorSignature].
-	•	Keep Shinami API keys strictly on the backend.
+- **GaslessTransaction**: built with `buildGaslessTransaction()`; sponsor-ready
+- **Never use `txb.gas` in gasless flows**; the gas object does not exist yet
+- **Sender provides assets, sponsor pays gas only**
+- Execute with two signatures in this order: `[userSignature, sponsorSignature]`
+- Keep Shinami API keys strictly on the backend
 
-⸻
+---
 
-Codebase Walk-through (File by File)
+## Codebase Walk-through (File by File)
 
-package.json — Key Dependencies
+### package.json — Key Dependencies
 
+```json
 {
   "@shinami/clients": "^0.9.7",
   "@mysten/sui": "^1.43.1",
@@ -197,13 +212,15 @@ package.json — Key Dependencies
   "next": "15.5.6",
   "react": "19.1.0"
 }
+```
 
-	•	@shinami/clients: Gas Station SDK
-	•	@mysten/sui + @mysten/dapp-kit: Sui client, wallet UI and hooks
-	•	@tanstack/react-query: Required by dApp Kit for caching/state
+- `@shinami/clients`: Gas Station SDK
+- `@mysten/sui` + `@mysten/dapp-kit`: Sui client, wallet UI and hooks
+- `@tanstack/react-query`: Required by dApp Kit for caching/state
 
-lib/shinami-client.ts — Initialize Clients
+### lib/shinami-client.ts — Initialize Clients
 
+```typescript
 import { GasStationClient } from "@shinami/clients/sui";
 import { SuiClient } from "@mysten/sui/client";
 
@@ -221,23 +238,24 @@ export const gasStationClient = new GasStationClient(
 export const suiClient = new SuiClient({
   url: `https://api.us1.shinami.com/node/v1/${process.env.SHINAMI_NODE_ACCESS_KEY}`,
 });
+```
 
-	•	Single source of truth for Shinami clients
-	•	These must be used server-side only
+- Single source of truth for Shinami clients
+- These must be used server-side only
 
-lib/types.ts — Type Contracts
+### lib/types.ts — Type Contracts
 
 Define request and response interfaces to keep FE/BE in sync.
 
-⸻
+---
 
-Backend API Routes
+## Backend API Routes
 
-/api/buildSponsoredTx — Sponsor Move calls
+### /api/buildSponsoredTx — Sponsor Move calls
 
-Flow
-	1.	Validate request → 2) buildGaslessTransaction() → 3) set sender → 4) sponsor → 5) return txBytes + sponsorSignature
+**Flow**: Validate request → `buildGaslessTransaction()` → set sender → sponsor → return txBytes + sponsorSignature
 
+```typescript
 import { NextRequest, NextResponse } from "next/server";
 import { buildGaslessTransaction } from "@shinami/clients/sui";
 import { gasStationClient, suiClient } from "@/lib/shinami-client";
@@ -266,11 +284,13 @@ export async function POST(request: NextRequest) {
     digest: sponsored.txDigest,
   });
 }
+```
 
-/api/buildTransferTx — Sponsor SUI transfers
+### /api/buildTransferTx — Sponsor SUI transfers
 
-Key rule: In gasless flows you cannot use txb.gas; use the sender’s coin.
+**Key rule**: In gasless flows you cannot use `txb.gas`; use the sender's coin.
 
+```typescript
 import { NextRequest, NextResponse } from "next/server";
 import { buildGaslessTransaction } from "@shinami/clients/sui";
 import { gasStationClient, suiClient } from "@/lib/shinami-client";
@@ -292,7 +312,7 @@ export async function POST(request: NextRequest) {
   const gaslessTx = await buildGaslessTransaction(
     (txb) => {
       const coinObjectId = coins.data[0].coinObjectId;
-      const [split] = txb.splitCoins(coinObjectId, [amount]); // use sender’s coin
+      const [split] = txb.splitCoins(coinObjectId, [amount]); // use sender's coin
       txb.transferObjects([split], recipient);
     },
     { sui: suiClient }
@@ -307,9 +327,11 @@ export async function POST(request: NextRequest) {
     digest: sponsored.txDigest,
   });
 }
+```
 
-/api/executeSponsoredTx — Backend Execution (optional)
+### /api/executeSponsoredTx — Backend Execution (optional)
 
+```typescript
 import { NextRequest, NextResponse } from "next/server";
 import { suiClient } from "@/lib/shinami-client";
 
@@ -324,16 +346,17 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ digest: result.digest, effects: result.effects });
 }
+```
 
-When to use
-	•	Need centralized logging, retries, or post-processing on the server
+**When to use**: Need centralized logging, retries, or post-processing on the server
 
-⸻
+---
 
-Frontend Components
+## Frontend Components
 
-components/Providers.tsx — App-wide Providers
+### components/Providers.tsx — App-wide Providers
 
+```typescript
 "use client";
 
 import { useState } from "react";
@@ -367,9 +390,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
     </QueryClientProvider>
   );
 }
+```
 
-components/TransferForm.tsx — Gasless Transfer UI
+### components/TransferForm.tsx — Gasless Transfer UI
 
+```typescript
 "use client";
 
 import { useState } from "react";
@@ -457,9 +482,11 @@ export function TransferForm({ senderAddress }: { senderAddress: string }) {
     </div>
   );
 }
+```
 
-app/layout.tsx — Root Layout
+### app/layout.tsx — Root Layout
 
+```typescript
 import "./globals.css";
 import "@mysten/dapp-kit/dist/index.css";
 import { Providers } from "@/components/Providers";
@@ -473,9 +500,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
+```
 
-app/page.tsx — Main Demo Page
+### app/page.tsx — Main Demo Page
 
+```typescript
 "use client";
 
 import { ConnectButton, useCurrentAccount, useSignTransaction, useSuiClient } from "@mysten/dapp-kit";
@@ -558,14 +587,15 @@ export default function Page() {
     </main>
   );
 }
+```
 
+---
 
-⸻
+## Smart Contract Module (Move)
 
-Smart Contract Module (Move)
+### move-example/sources/math.move
 
-move-example/sources/math.move
-
+```rust
 module move_example::math {
     use sui::event;
 
@@ -582,102 +612,120 @@ module move_example::math {
 
     public entry fun hello_world() {}
 }
+```
 
-Publish
+### Publish
 
+```bash
 cd move-example
 sui client publish --gas-budget 100000000
 # Copy the package id into NEXT_PUBLIC_MOVE_PACKAGE_ID
+```
 
+---
 
-⸻
+## End-to-End Flows
 
-End-to-End Flows
+### Flow A — Frontend Execute
 
-Flow A — Frontend Execute
-	1.	Frontend → /api/buildSponsoredTx with params
-	2.	Backend builds gasless tx, sponsors via Shinami → returns txBytes + sponsor signature
-	3.	Frontend wallet signs txBytes → gets user signature
-	4.	Frontend executes with [userSig, sponsorSig]
-	5.	Success digest shown
+1. Frontend → `/api/buildSponsoredTx` with params
+2. Backend builds gasless tx, sponsors via Shinami → returns txBytes + sponsor signature
+3. Frontend wallet signs txBytes → gets user signature
+4. Frontend executes with `[userSig, sponsorSig]`
+5. Success digest shown
 
-Flow B — Backend Execute
+### Flow B — Backend Execute
 
 Same as Flow A up to user signature, then:
-4. Frontend POSTs to /api/executeSponsoredTx with txBytes, sponsorSig, userSig
+
+4. Frontend POSTs to `/api/executeSponsoredTx` with txBytes, sponsorSig, userSig
 5. Backend submits, returns digest and effects
 
-⸻
+---
 
-Live Demo Script
-	1.	Connect Wallet
-	•	Show Connect button and connected address
-	2.	Gasless SUI Transfer
-	•	Fill recipient + amount
-	•	Click Send SUI (Gas-Free)
-	•	Approve in wallet
-	•	Show digest and gas not deducted from user
-	3.	Move Function Call math::add
-	•	Enter two numbers
-	•	Run Submit on Frontend
-	•	Show success and event on explorer
-	•	Repeat with Submit on Backend (centralized execution)
-	4.	Shinami Dashboard
-	•	Show Gas Station fund balance and sponsored tx log
+## Live Demo Script
 
-⸻
+### 1. Connect Wallet
 
-Common Pitfalls & Fixes
-	•	“Invalid params” → You built bytes manually. Use buildGaslessTransaction().
-	•	Using txb.gas → Not available in gasless flows. Split from sender’s coin.
-	•	realFetch.call error → Externalize @shinami/clients in next.config.ts.
-	•	Empty wallet for transfers → Sponsor pays gas, user must have the transfer amount.
-	•	API keys in frontend → Keep Gas Station & Node keys backend only.
-	•	Wrong signature order → Must be [userSignature, sponsorSignature].
+- Show Connect button and connected address
 
-⸻
+### 2. Gasless SUI Transfer
 
-Production Considerations
-	•	Security: input validation, rate limiting, auth/allowlists, per-user caps.
-	•	Monitoring: Gas Station balance alerts, sponsorship logs, failure alerts.
-	•	Budgeting: Prefer auto-budgeting; manual only if you know exact needs.
-	•	Reliability: retries on backend, idempotent APIs, structured logging.
-	•	Back office: webhook receipts, exports, and clean accounting mapping.
+- Fill recipient + amount
+- Click Send SUI (Gas-Free)
+- Approve in wallet
+- Show digest and gas not deducted from user
 
-⸻
+### 3. Move Function Call math::add
 
-Testing & Verification
-	•	Wallet connects on Testnet
-	•	Transfer works if user has transfer amount
-	•	Move call works even with empty wallet
-	•	Sponsored transactions show two signatures in explorers
-	•	Shinami dashboard lists your sponsored tx with gas cost
+- Enter two numbers
+- Run Submit on Frontend
+- Show success and event on explorer
+- Repeat with Submit on Backend (centralized execution)
 
-⸻
+### 4. Shinami Dashboard
 
-Workshop Timeline (60 minutes)
-	•	00:00–10:00 Problem & solution, two-signature concept
-	•	10:00–20:00 Architecture and project structure
-	•	20:00–30:00 Code walk-through (clients, routes, FE, Move)
-	•	30:00–45:00 Live demos: transfer, move call, dashboard
-	•	45:00–55:00 Pitfalls, production checklist, Q&A
-	•	55:00–60:00 Resources & next steps
+- Show Gas Station fund balance and sponsored tx log
 
-⸻
+---
 
-Presenter Notes
-	•	Use real tx links as proof; keep a fallback screenshot.
-	•	If network is flaky, have a short pre-recorded clip.
-	•	Repeat the mantra: user first, sponsor second (signature order).
-	•	Emphasize: Gas Station pays gas; user provides assets.
-	•	Keep FE simple; move sensitive logic to backend.
+## Common Pitfalls & Fixes
 
-⸻
+- **"Invalid params"** → You built bytes manually. Use `buildGaslessTransaction()`
+- **Using `txb.gas`** → Not available in gasless flows. Split from sender's coin
+- **realFetch.call error** → Externalize `@shinami/clients` in next.config.ts
+- **Empty wallet for transfers** → Sponsor pays gas, user must have the transfer amount
+- **API keys in frontend** → Keep Gas Station & Node keys backend only
+- **Wrong signature order** → Must be `[userSignature, sponsorSignature]`
 
-Quick Reference
+---
 
-Build → Sponsor → Sign → Execute
+## Production Considerations
 
+- **Security**: input validation, rate limiting, auth/allowlists, per-user caps
+- **Monitoring**: Gas Station balance alerts, sponsorship logs, failure alerts
+- **Budgeting**: Prefer auto-budgeting; manual only if you know exact needs
+- **Reliability**: retries on backend, idempotent APIs, structured logging
+- **Back office**: webhook receipts, exports, and clean accounting mapping
+
+---
+
+## Testing & Verification
+
+- Wallet connects on Testnet
+- Transfer works if user has transfer amount
+- Move call works even with empty wallet
+- Sponsored transactions show two signatures in explorers
+- Shinami dashboard lists your sponsored tx with gas cost
+
+---
+
+## Workshop Timeline (60 minutes)
+
+- **00:00–10:00** Problem & solution, two-signature concept
+- **10:00–20:00** Architecture and project structure
+- **20:00–30:00** Code walk-through (clients, routes, FE, Move)
+- **30:00–45:00** Live demos: transfer, move call, dashboard
+- **45:00–55:00** Pitfalls, production checklist, Q&A
+- **55:00–60:00** Resources & next steps
+
+---
+
+## Presenter Notes
+
+- Use real tx links as proof; keep a fallback screenshot
+- If network is flaky, have a short pre-recorded clip
+- Repeat the mantra: user first, sponsor second (signature order)
+- Emphasize: Gas Station pays gas; user provides assets
+- Keep FE simple; move sensitive logic to backend
+
+---
+
+## Quick Reference
+
+### Build → Sponsor → Sign → Execute
+
+```typescript
 // Backend
 const gaslessTx = await buildGaslessTransaction(
   (txb) => {
@@ -697,9 +745,11 @@ await suiClient.executeTransactionBlock({
   transactionBlock: sponsored.txBytes,
   signature: [userSignature, sponsored.sponsorSignature],
 });
+```
 
-SUI Transfer Pattern (no txb.gas)
+### SUI Transfer Pattern (no txb.gas)
 
+```typescript
 const coins = await suiClient.getCoins({ owner: sender, coinType: "0x2::sui::SUI" });
 const gaslessTx = await buildGaslessTransaction(
   (txb) => {
@@ -708,24 +758,26 @@ const gaslessTx = await buildGaslessTransaction(
   },
   { sui: suiClient }
 );
+```
 
+---
 
-⸻
+## Next Steps & Resources
 
-Next Steps & Resources
+### Extend the app
 
-Extend the app
-	•	Add NFT transfers, token swaps, event indexing
-	•	Build history UI and status polling
-	•	Add auth and per-user sponsorship limits
+- Add NFT transfers, token swaps, event indexing
+- Build history UI and status polling
+- Add auth and per-user sponsorship limits
 
-Docs & Links
-	•	Shinami Docs
-	•	Shinami Dashboard
-	•	Sui Docs
-	•	dApp Kit Docs
-	•	Shinami Examples
+### Docs & Links
 
-⸻
+- [Shinami Docs](https://docs.shinami.com)
+- [Shinami Dashboard](https://app.shinami.com)
+- [Sui Docs](https://docs.sui.io)
+- [dApp Kit Docs](https://sdk.mystenlabs.com/dapp-kit)
+- [Shinami Examples](https://github.com/shinamicorp/shinami-examples)
 
-You now have a complete, production-ready template and a full workshop script — all in one file. Ship gasless UX with confidence. 🚀
+---
+
+You now have a complete, production-ready template and a full workshop script — all in one file. Ship gasless UX with confidence! 🚀
